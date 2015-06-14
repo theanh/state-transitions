@@ -2,6 +2,9 @@
   "name": "state-transitions",
   "version": "1.0.1",
   "description": "Provides mixins to transition between elements when the view changes",
+  "keywords": [
+    "react-component"
+  ],
   "main": "index.js",
   "scripts": {
     "build": "babel src/index.js -o index.js",

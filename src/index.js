@@ -409,11 +409,56 @@ const TransitionInOut = {
 	}
 };
 
+var animationMixins = {
+	'tweenState': TweenState,
+	'transitionInOut': TransitionInOut
+};
+var animationOptionValues = {
+	tweenState: [
+		'transitionBodyDuration',
+		'transitionBodyTimingFunction',
+		'transitionEndDuration',
+		'transitionEndTimingFunction'
+	],
+	transitionInOut: [
+		'animateOutClassName'
+	]
+};
+function animateComponent(animations, Component) {
+	var mixins = _(animationMixins)
+		.pick(_.keys(animations))
+		.values()
+		.value();
+
+	var animationOptions = _.transform(animations, (out, options, name) => (
+		_.assign(out, _.pick(options, animationOptionValues[name]))
+	), {});
+
+	var classInstance = _.assign({
+		mixins,
+		getRefs() {
+			var { tweenState } = animations;
+			var refs = this.refs.mainComponent.refs;
+
+			if (tweenState && tweenState.transformRefs) {
+				return tweenState.transformRefs(refs);
+			} else {
+				return refs;
+			}
+		},
+		render() {
+			return <Component ref='mainComponent' {...this.props} />;
+		}
+	}, animationOptions);
+
+	return React.createClass(classInstance);
+}
+
 module.exports = function init(react) {
 	// We have to use the user's React object, as it stores state and stuff.
 	React = react;
 
 	return {
-		TweenState, TransitionInOut
+		TweenState, TransitionInOut, animateComponent
 	};
 };

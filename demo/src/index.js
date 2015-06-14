@@ -4,27 +4,31 @@ const React = require('react');
 const Router = require('react-router');
 const _ = require('lodash');
 
-const { TweenState, TransitionInOut } = require('../../index')(React);
+const { animateComponent } = require('../../index')(React);
 
 const pokemon = require('../data/pokemon.json');
 
 const { Route, DefaultRoute, RouteHandler, Link } = Router;
 
 
-const List = React.createClass({
-	mixins: [TweenState, TransitionInOut],
-	animateOutClassName: 'link-view--leaving',
-	transitionEndTime: -1,
-	getInitialState() {
-		return {
+const List = animateComponent({
+	tweenState: {},
+	transitionInOut: {
+		animateOutClassName: 'link-view--leaving'
+	}
+}, class List extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
 			search: ''
 		};
-	},
+		this.onChange = this.onChange.bind(this);
+	}
 	onChange(e) {
 		this.setState({
 			search: e.target.value
 		});
-	},
+	}
 	render() {
 		var { search } = this.state;
 
@@ -57,9 +61,9 @@ const List = React.createClass({
 	}
 });
 
-const View = React.createClass({
-	mixins: [TweenState],
-	transitionEndTime: -1,
+const View = animateComponent({
+	tweenState: {}
+}, class View extends React.Component {
 	render() {
 		var { id } = this.props.params;
 

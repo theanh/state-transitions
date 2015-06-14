@@ -1,5 +1,7 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var React;
 var events = require('events');
 var _ = require('lodash');
@@ -432,11 +434,47 @@ var TransitionInOut = {
 	}
 };
 
+var animationMixins = {
+	'tweenState': TweenState,
+	'transitionInOut': TransitionInOut
+};
+var animationOptionValues = {
+	tweenState: ['transitionBodyDuration', 'transitionBodyTimingFunction', 'transitionEndDuration', 'transitionEndTimingFunction'],
+	transitionInOut: ['animateOutClassName']
+};
+function animateComponent(animations, Component) {
+	var mixins = _(animationMixins).pick(_.keys(animations)).values().value();
+
+	var animationOptions = _.transform(animations, function (out, options, name) {
+		return _.assign(out, _.pick(options, animationOptionValues[name]));
+	}, {});
+
+	var classInstance = _.assign({
+		mixins: mixins,
+		getRefs: function getRefs() {
+			var tweenState = animations.tweenState;
+
+			var refs = this.refs.mainComponent.refs;
+
+			if (tweenState && tweenState.transformRefs) {
+				return tweenState.transformRefs(refs);
+			} else {
+				return refs;
+			}
+		},
+		render: function render() {
+			return React.createElement(Component, _extends({ ref: 'mainComponent' }, this.props));
+		}
+	}, animationOptions);
+
+	return React.createClass(classInstance);
+}
+
 module.exports = function init(react) {
 	// We have to use the user's React object, as it stores state and stuff.
 	React = react;
 
 	return {
-		TweenState: TweenState, TransitionInOut: TransitionInOut
+		TweenState: TweenState, TransitionInOut: TransitionInOut, animateComponent: animateComponent
 	};
 };
