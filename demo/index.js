@@ -75,14 +75,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var RouteHandler = Router.RouteHandler;
 	var Link = Router.Link;
 	
-	var List = animateComponent({
-		tweenState: {},
-		transitionInOut: {
-			animateOutClassName: 'link-view--leaving'
-		}
-	}, (function (_React$Component) {
+	var List = (function (_React$Component) {
 		function List(props) {
-			_classCallCheck(this, List);
+			_classCallCheck(this, _List);
 	
 			_React$Component.call(this, props);
 			this.state = {
@@ -93,13 +88,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		_inherits(List, _React$Component);
 	
-		List.prototype.onChange = function onChange(e) {
+		var _List = List;
+	
+		_List.prototype.onChange = function onChange(e) {
 			this.setState({
 				search: e.target.value
 			});
 		};
 	
-		List.prototype.render = function render() {
+		_List.prototype.render = function render() {
 			var search = this.state.search;
 	
 			var pokeItems = _(pokemon).pick(function (_ref) {
@@ -140,14 +137,18 @@ return /******/ (function(modules) { // webpackBootstrap
 			);
 		};
 	
+		List = animateComponent({
+			tweenState: {},
+			transitionInOut: {
+				animateOutClassName: 'link-view--leaving'
+			}
+		})(List) || List;
 		return List;
-	})(React.Component));
+	})(React.Component);
 	
-	var View = animateComponent({
-		tweenState: {}
-	}, (function (_React$Component2) {
+	var View = (function (_React$Component2) {
 		function View() {
-			_classCallCheck(this, View);
+			_classCallCheck(this, _View);
 	
 			if (_React$Component2 != null) {
 				_React$Component2.apply(this, arguments);
@@ -156,7 +157,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 		_inherits(View, _React$Component2);
 	
-		View.prototype.render = function render() {
+		var _View = View;
+	
+		_View.prototype.render = function render() {
 			var id = this.props.params.id;
 			var _pokemon$id = pokemon[id];
 			var name = _pokemon$id.name;
@@ -351,8 +354,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			);
 		};
 	
+		View = animateComponent({
+			tweenState: {}
+		})(View) || View;
 		return View;
-	})(React.Component));
+	})(React.Component);
 	
 	var App = React.createClass({
 		displayName: 'App',
@@ -36573,32 +36579,34 @@ return /******/ (function(modules) { // webpackBootstrap
 		tweenState: ['transitionBodyDuration', 'transitionBodyTimingFunction', 'transitionEndDuration', 'transitionEndTimingFunction'],
 		transitionInOut: ['animateOutClassName']
 	};
-	function animateComponent(animations, Component) {
+	function animateComponent(animations) {
 		var mixins = _(animationMixins).pick(_.keys(animations)).values().value();
 	
 		var animationOptions = _.transform(animations, function (out, options, name) {
 			return _.assign(out, _.pick(options, animationOptionValues[name]));
 		}, {});
 	
-		var classInstance = _.assign({
-			mixins: mixins,
-			getRefs: function getRefs() {
-				var tweenState = animations.tweenState;
+		return function animateComponentInstantiator(Component) {
+			var classInstance = _.assign({
+				mixins: mixins,
+				getRefs: function getRefs() {
+					var tweenState = animations.tweenState;
 	
-				var refs = this.refs.mainComponent.refs;
+					var refs = this.refs.mainComponent.refs;
 	
-				if (tweenState && tweenState.transformRefs) {
-					return tweenState.transformRefs(refs);
-				} else {
-					return refs;
+					if (tweenState && tweenState.transformRefs) {
+						return tweenState.transformRefs(refs);
+					} else {
+						return refs;
+					}
+				},
+				render: function render() {
+					return React.createElement(Component, _extends({ ref: 'mainComponent' }, this.props));
 				}
-			},
-			render: function render() {
-				return React.createElement(Component, _extends({ ref: 'mainComponent' }, this.props));
-			}
-		}, animationOptions);
+			}, animationOptions);
 	
-		return React.createClass(classInstance);
+			return React.createClass(classInstance);
+		};
 	}
 	
 	module.exports = function init(react) {

@@ -442,32 +442,34 @@ var animationOptionValues = {
 	tweenState: ['transitionBodyDuration', 'transitionBodyTimingFunction', 'transitionEndDuration', 'transitionEndTimingFunction'],
 	transitionInOut: ['animateOutClassName']
 };
-function animateComponent(animations, Component) {
+function animateComponent(animations) {
 	var mixins = _(animationMixins).pick(_.keys(animations)).values().value();
 
 	var animationOptions = _.transform(animations, function (out, options, name) {
 		return _.assign(out, _.pick(options, animationOptionValues[name]));
 	}, {});
 
-	var classInstance = _.assign({
-		mixins: mixins,
-		getRefs: function getRefs() {
-			var tweenState = animations.tweenState;
+	return function animateComponentInstantiator(Component) {
+		var classInstance = _.assign({
+			mixins: mixins,
+			getRefs: function getRefs() {
+				var tweenState = animations.tweenState;
 
-			var refs = this.refs.mainComponent.refs;
+				var refs = this.refs.mainComponent.refs;
 
-			if (tweenState && tweenState.transformRefs) {
-				return tweenState.transformRefs(refs);
-			} else {
-				return refs;
+				if (tweenState && tweenState.transformRefs) {
+					return tweenState.transformRefs(refs);
+				} else {
+					return refs;
+				}
+			},
+			render: function render() {
+				return React.createElement(Component, _extends({ ref: 'mainComponent' }, this.props));
 			}
-		},
-		render: function render() {
-			return React.createElement(Component, _extends({ ref: 'mainComponent' }, this.props));
-		}
-	}, animationOptions);
+		}, animationOptions);
 
-	return React.createClass(classInstance);
+		return React.createClass(classInstance);
+	};
 }
 
 module.exports = function init(react) {

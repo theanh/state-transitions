@@ -424,7 +424,7 @@ var animationOptionValues = {
 		'animateOutClassName'
 	]
 };
-function animateComponent(animations, Component) {
+function animateComponent(animations) {
 	var mixins = _(animationMixins)
 		.pick(_.keys(animations))
 		.values()
@@ -434,24 +434,26 @@ function animateComponent(animations, Component) {
 		_.assign(out, _.pick(options, animationOptionValues[name]))
 	), {});
 
-	var classInstance = _.assign({
-		mixins,
-		getRefs() {
-			var { tweenState } = animations;
-			var refs = this.refs.mainComponent.refs;
+	return function animateComponentInstantiator(Component) {
+		var classInstance = _.assign({
+			mixins,
+			getRefs() {
+				var { tweenState } = animations;
+				var refs = this.refs.mainComponent.refs;
 
-			if (tweenState && tweenState.transformRefs) {
-				return tweenState.transformRefs(refs);
-			} else {
-				return refs;
+				if (tweenState && tweenState.transformRefs) {
+					return tweenState.transformRefs(refs);
+				} else {
+					return refs;
+				}
+			},
+			render() {
+				return <Component ref='mainComponent' {...this.props} />;
 			}
-		},
-		render() {
-			return <Component ref='mainComponent' {...this.props} />;
-		}
-	}, animationOptions);
+		}, animationOptions);
 
-	return React.createClass(classInstance);
+		return React.createClass(classInstance);
+	};
 }
 
 module.exports = function init(react) {

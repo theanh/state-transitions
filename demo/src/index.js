@@ -11,12 +11,13 @@ const pokemon = require('../data/pokemon.json');
 const { Route, DefaultRoute, RouteHandler, Link } = Router;
 
 
-const List = animateComponent({
+@animateComponent({
 	tweenState: {},
 	transitionInOut: {
 		animateOutClassName: 'link-view--leaving'
 	}
-}, class List extends React.Component {
+})
+class List extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -59,11 +60,12 @@ const List = animateComponent({
 			</div>
 		);
 	}
-});
+}
 
-const View = animateComponent({
+@animateComponent({
 	tweenState: {}
-}, class View extends React.Component {
+})
+class View extends React.Component {
 	render() {
 		var { id } = this.props.params;
 
@@ -146,7 +148,7 @@ const View = animateComponent({
 			</div>
 		);
 	}
-});
+}
 
 const App = React.createClass({
 	render() {

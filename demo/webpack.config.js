@@ -14,7 +14,11 @@ module.exports = {
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
-				loader: 'babel-loader?loose=all'
+				loader: 'babel',
+				query: {
+					loose: 'all',
+					optional: ['es7.decorators']
+				}
 			},
 			{
 				test: /\.json$/,
